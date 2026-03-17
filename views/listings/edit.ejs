@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vantage</title>
+  </head>
+  <body>
+    <h3>Edit your listing</h3>
+
+    <form action="/listings/<%= listing._id %>?_method=PUT" method="post">
+      <input
+        type="text"
+        name="listing[title]"
+        value="<%= listing.title %>"
+        placeholder="Enter title"
+      />
+      <br /><br />
+      <textarea name="listing[description]" placeholder="Enter description">
+<%= listing.description %></textarea
+      >
+      <br /><br />
+      <input
+        type="text"
+        name="listing[image]"
+        value="<%= listing.image %>"
+        placeholder="Enter image URL/link"
+      />
+      <br /><br />
+      <input
+        type="number"
+        name="listing[price]"
+        value="<%= listing.price %>"
+        placeholder="Enter price"
+      />
+      <br /><br />
+      <input
+        type="text"
+        name="listing[country]"
+        value="<%= listing.country %>"
+        placeholder="Enter country"
+      />
+      <br /><br />
+      <input
+        type="text"
+        name="listing[location]"
+        value="<%= listing.location %>"
+        placeholder="Enter location"
+      />
+      <br /><br />
+
+      <button type="submit">Edit Listing</button>
+    </form>
+  </body>
+</html>
