@@ -3,7 +3,7 @@
   <div class="row">
     <div class="col-8 offset-2">
       <h3>Edit new listing</h3>
-      <form action="/listings/<%= listing._id %>?_method=PUT" method="post">
+      <form action="/listings/<%= listing._id %>?_method=PUT" method="post" novalidate class="needs-validation">
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
           <input
@@ -12,7 +12,9 @@
             class="form-control"
             value="<%= listing.title %>"
             placeholder="Add a catchy title"
+            required
           />
+          <div class="valid-feedback">Title Looks good!</div>
         </div>
     
         <div class="mb-3">
@@ -21,7 +23,9 @@
             name="listing[description]"
             placeholder="Enter description"
             class="form-control"
+            required
           ><%= listing.description %></textarea>
+          <div class="invalid-feedback">Please enter a short description</div>
         </div>
     
         <div class="mb-3">
@@ -32,19 +36,22 @@
             class="form-control"
             value="<%= listing.image.url %>"
             placeholder="Enter image URL/link"
+            required
           />
+          <div class="invalid-feedback">Image Link is required</div>
         </div>
     
         <div class="row">
           <div class="mb-3 col-md-4">
             <label for="price" class="form-label">Price</label>
             <input
-              type="number"
               name="listing[price]"
               class="form-control"
               placeholder="1200"
               value="<%= listing.price %>"
+              required
             />
+            <div class="invalid-feedback">Price should be valid</div>
           </div>
       
           <div class="mb-3 col-md-8">
@@ -55,7 +62,9 @@
               class="form-control"
               value="<%= listing.country %>"
               placeholder="India"
+              required
             />
+            <div class="invalid-feedback">Country should be valid</div>
           </div>
         </div>
     
@@ -67,7 +76,9 @@
             class="form-control"
             value="<%= listing.location %>"
             placeholder="Jaipur, Rajasthan"
+            required
           />
+          <div class="invalid-feedback">Location is required</div>
         </div>
     
         <button type="submit" class="btn red-btn">Add to Listings</button>
