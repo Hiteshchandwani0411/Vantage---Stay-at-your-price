@@ -1,0 +1,47 @@
+<% layout("/layouts/boilerplate") %>
+
+<body>
+  <div class="row">
+    <div class="col-6 offset-3">
+      <h1>SignUp on Vantage</h1>
+      <form action="/signup" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            name="username"
+            class="form-control"
+            placeholder="John Doe"
+            required
+          />
+          <div class="valid-feedback">Username Looks good!</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="abc@gmail.com"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="Must be 6 characters or more."
+            class="form-control"
+            required
+          />
+        </div>
+
+        <button class="btn red-btn">Submit</button>
+      </form>
+      <h6 class="auth">Already have an account? <a href="http://localhost:4000/login">Login</a></h6>
+    </div>
+  </div>
+</body>

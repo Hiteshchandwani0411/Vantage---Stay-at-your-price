@@ -98,3 +98,11 @@ footer {
     display: flex;
     gap: 0.5rem;
 }
+
+.auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 300;
+    margin-top: 1rem;
+}
