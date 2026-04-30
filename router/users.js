@@ -10,22 +10,20 @@ const {
   loginUser,
 } = require("../controllers/user.controller");
 
-router.get("/signup", signup);
+router.route("/signup").get(signup).post(registerUser);
 
-router.get("/login", login);
+router
+  .route("/login")
+  .get(login)
+  .post(
+    saveRedirectUrl,
+    passport.authenticate("local", {
+      failureRedirect: "/login",
+      failureFlash: true,
+    }),
+    loginUser,
+  );
 
 router.get("/logout", logout);
-
-router.post("/signup", registerUser);
-
-router.post(
-  "/login",
-  saveRedirectUrl,
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  loginUser,
-);
 
 module.exports = router;

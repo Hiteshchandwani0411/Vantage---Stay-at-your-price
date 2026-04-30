@@ -13,31 +13,20 @@ const {
   editListing,
 } = require("../controllers/listing.controller");
 
-// Index Route
-router.get("/", wrapAsync(index));
+router
+  .route("/")
+  .get(wrapAsync(index))
+  .post(isLoggedIn, validateListing, wrapAsync(createListing));
 
 // New listing
 router.get("/new", isLoggedIn, newListing);
-
-// Show Route
-router.get("/:id", wrapAsync(showListing));
+router
+  .route("/:id")
+  .get(wrapAsync(showListing))
+  .put(isLoggedIn, isOwner, validateListing, wrapAsync(updateListing))
+  .delete(isLoggedIn, isOwner, wrapAsync(destoryListing));
 
 // Edit Route
 router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(editListing));
-
-// Create Route
-router.post("/", isLoggedIn, validateListing, wrapAsync(createListing));
-
-// Update route
-router.put(
-  "/:id",
-  isLoggedIn,
-  isOwner,
-  validateListing,
-  wrapAsync(updateListing),
-);
-
-// Delete Route
-router.delete("/:id", isLoggedIn, isOwner, wrapAsync(destoryListing));
 
 module.exports = router;
