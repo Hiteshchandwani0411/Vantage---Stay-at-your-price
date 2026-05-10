@@ -106,3 +106,18 @@ footer {
     font-weight: 300;
     margin-top: 1rem;
 }
+
+.preview-img {
+  width: 300px;           /* Preview ki width fix karein */
+  height: 200px;          /* Height fix karein */
+  object-fit: cover;      /* Taaki image stretch na ho, crop ho kar fit ho jaye */
+  border-radius: 10px;    /* Thode soft corners */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Halka sa shadow premium look ke liye */
+}
+
+.image-preview-container {
+  margin-top: 10px;
+  border: 1px dashed #ccc; /* Ek border jo bata sake ye preview area hai */
+  padding: 10px;
+  display: inline-block;
+}
