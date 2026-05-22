@@ -1,5 +1,7 @@
 const Listing = require("../models/listing");
 const { listingSchema } = require("../schema");
+const maptilerClient = require("@maptiler/client");
+maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
   const allListings = await Listing.find({});
@@ -38,14 +40,32 @@ module.exports.editListing = async (req, res) => {
 
 module.exports.createListing = async (req, res) => {
   let result = listingSchema.validate(req.body);
-  let url = req.file.path;
-  let filename = req.file.filename;
-  console.log(result);
+  let url = req.file ? req.file.path : "";
+  let filename = req.file ? req.file.filename : "";
+
+  const queryText = `${req.body.listing.location}, ${req.body.listing.country}`;
+  const geocodeResult = await maptilerClient.geocoding.forward(queryText, {
+    limit: 1,
+  });
+
+  if (!geocodeResult.features || geocodeResult.features.length === 0) {
+    req.flash("error", "Valid location nahi mil saki!");
+    return res.redirect("/listings/new");
+  }
+
+  const coordinates = geocodeResult.features[0].geometry.coordinates;
 
   const newListing = new Listing(req.body.listing);
-  newListing.image.url = url;
-  newListing.image.filename = filename;
+  if (url && filename) {
+    newListing.image.url = url;
+    newListing.image.filename = filename;
+  }
   newListing.owner = req.user._id;
+
+  newListing.geometry = {
+    type: 'Point',
+    coordinates: coordinates // [longitude, latitude]
+  };
   await newListing.save();
   console.log(newListing);
 
@@ -70,7 +90,6 @@ module.exports.updateListing = async (req, res) => {
     updatedListing.image.filename = filename;
     await updatedListing.save();
   }
-
 
   console.log(updatedListing);
   req.flash("success", "Listing Updated!");

@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@maptiler/client": "^3.0.2",
     "cloudinary": "^2.10.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^17.3.1",

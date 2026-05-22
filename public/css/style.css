@@ -121,3 +121,11 @@ footer {
   padding: 10px;
   display: inline-block;
 }
+
+/* Map */
+#map { 
+  height: 400px; 
+  width: 100%; /* Optional, but good for responsiveness */
+  border-radius: 1rem;
+}
+

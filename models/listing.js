@@ -34,6 +34,18 @@ const listingSchema = new Schema(
       required: true,
     },
     location: String,
+    geometry: {
+      type: {
+        type: String, 
+        enum: ['Point'],
+        required: true,
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        required: true
+      }
+    },
     country: {
       type: String,
       required: true,
