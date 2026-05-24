@@ -1,103 +1,340 @@
 <% layout("/layouts/boilerplate") %>
-<body>
-  <div class="row">
-    <div class="col-8 offset-2">
-      <h3>Edit new listing</h3>
-      <form
-        action="/listings/<%= listing._id %>?_method=PUT"
-        method="post"
-        novalidate
-        class="needs-validation"
-        enctype="multipart/form-data"
-      >
-        <div class="mb-3">
-          <label for="title" class="form-label">Title</label>
-          <input
-            type="text"
-            name="listing[title]"
-            class="form-control"
-            value="<%= listing.title %>"
-            placeholder="Add a catchy title"
-            required
-          />
-        </div>
 
-        <div class="mb-3">
-          <label for="description" class="form-label">Enter Description</label>
-          <textarea
-            name="listing[description]"
-            placeholder="Enter description"
-            class="form-control"
-            required
-          >
-<%= listing.description %></textarea
-          >
-          <div class="invalid-feedback">Please enter a short description</div>
-        </div>
+<style>
+  .form-container {
+    max-width: 700px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
 
-        <div class="mb-3">
-          <p class="form-label">Current Image Preview</p>
-          <div class="image-preview-container">
-            <img
-              src="<%= originalImageUrl %>"
-              alt="<%= listing.image.filename %>"
-              class="img-thumbnail preview-img"
-            />
-          </div>
-        </div>
+  .form-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
 
-        <div class="mb-3">
-          <label for="image" class="form-label">Upload New Image</label>
-          <input
-            class="form-control"
-            name="listing[image][url]"
-            type="file"
-            id="formFile"
-          />
-        </div>
+  .form-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #222222;
+    margin: 0;
+  }
 
-        <div class="row">
-          <div class="mb-3 col-md-4">
-            <label for="price" class="form-label">Price</label>
-            <input
-              name="listing[price]"
-              class="form-control"
-              placeholder="1200"
-              value="<%= listing.price %>"
-              required
-            />
-            <div class="invalid-feedback">Price should be valid</div>
-          </div>
+  .form-header p {
+    color: #717171;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
 
-          <div class="mb-3 col-md-8">
-            <label for="country" class="form-label">Country</label>
-            <input
-              type="text"
-              name="listing[country]"
-              class="form-control"
-              value="<%= listing.country %>"
-              placeholder="India"
-              required
-            />
-            <div class="invalid-feedback">Country should be valid</div>
-          </div>
-        </div>
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
 
-        <div class="mb-3">
-          <label for="location" class="form-label">Location</label>
-          <input
-            type="text"
-            name="listing[location]"
-            class="form-control"
-            value="<%= listing.location %>"
-            placeholder="Jaipur, Rajasthan"
-            required
-          />
-          <div class="invalid-feedback">Location is required</div>
-        </div>
+  .form-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #222222;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
 
-        <button type="submit" class="btn red-btn">Add to Listings</button>
-      </form>
-    </div>
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .form-label .required {
+    color: #fe424d;
+  }
+
+  .form-help-text {
+    display: block;
+    color: #717171;
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  .form-control,
+  textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #fe424d;
+    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.1);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .form-control::placeholder,
+  textarea::placeholder {
+    color: #b0b0b0;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .file-input-wrapper {
+    position: relative;
+  }
+
+  .file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px dashed #d0d0d0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: #717171;
+  }
+
+  .file-input-label:hover {
+    border-color: #fe424d;
+    background-color: rgba(254, 66, 77, 0.02);
+  }
+
+  .file-input-label i {
+    font-size: 1.8rem;
+    color: #fe424d;
+    margin-right: 0.5rem;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .image-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .image-preview-title {
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 0.75rem;
+  }
+
+  .preview-img {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .submit-btn,
+  .cancel-btn {
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    flex: 1;
+  }
+
+  .submit-btn {
+    background-color: #fe424d;
+    color: white;
+  }
+
+  .submit-btn:hover {
+    background-color: #e63840;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(254, 66, 77, 0.3);
+  }
+
+  .cancel-btn {
+    background-color: #f0f0f0;
+    color: #222222;
+  }
+
+  .cancel-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .valid-feedback {
+    display: none;
+    color: #198754;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  .form-control.is-valid ~ .valid-feedback {
+    display: block;
+  }
+</style>
+
+<div class="form-container">
+  <div class="form-header">
+    <h1>Edit Your Property</h1>
+    <p>Update your listing details</p>
   </div>
-</body>
+
+  <form action="/listings/<%= listing._id %>?_method=PUT" method="post" novalidate class="needs-validation" enctype="multipart/form-data">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">📝 Basic Information</h2>
+
+      <div class="form-group">
+        <label for="title" class="form-label">
+          Property Title <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="title"
+          name="listing[title]"
+          class="form-control"
+          value="<%= listing.title %>"
+          placeholder="e.g., Cozy Studio in Downtown"
+          required
+        />
+        <div class="valid-feedback">Title looks great!</div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">
+          Description <span class="required">*</span>
+        </label>
+        <textarea
+          id="description"
+          name="listing[description]"
+          placeholder="Describe your property in detail..."
+          required
+        ><%= listing.description %></textarea>
+        <div class="invalid-feedback">Please add a description</div>
+      </div>
+    </div>
+
+    <!-- Location Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">📍 Location</h2>
+
+      <div class="form-group">
+        <label for="location" class="form-label">
+          Address/Area <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="location"
+          name="listing[location]"
+          class="form-control"
+          value="<%= listing.location %>"
+          placeholder="e.g., Jaipur, Rajasthan"
+          required
+        />
+        <div class="invalid-feedback">Location is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="country" class="form-label">
+          Country <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="country"
+          name="listing[country]"
+          class="form-control"
+          value="<%= listing.country %>"
+          placeholder="e.g., India"
+          required
+        />
+        <div class="invalid-feedback">Country is required</div>
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">💰 Pricing</h2>
+
+      <div class="form-group">
+        <label for="price" class="form-label">
+          Price per Night <span class="required">*</span>
+        </label>
+        <input
+          type="number"
+          id="price"
+          name="listing[price]"
+          class="form-control"
+          value="<%= listing.price %>"
+          placeholder="1200"
+          required
+        />
+        <span class="form-help-text">Enter price in INR</span>
+        <div class="invalid-feedback">Please enter a valid price</div>
+      </div>
+    </div>
+
+    <!-- Image Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">🖼️ Property Image</h2>
+
+      <div class="image-preview">
+        <p class="image-preview-title">Current Image</p>
+        <img src="<%= originalImageUrl %>" alt="<%= listing.image.filename %>" class="preview-img" />
+      </div>
+
+      <div class="form-group" style="margin-top: 1.5rem;">
+        <label for="image" class="form-label">Update Image (Optional)</label>
+        <div class="file-input-wrapper">
+          <label for="formFile" class="file-input-label">
+            <div>
+              <i class="fas fa-cloud-upload-alt"></i>
+              <div>Click to upload a new image</div>
+              <small style="color: #b0b0b0;">JPG, PNG up to 10MB</small>
+            </div>
+          </label>
+          <input class="form-control" id="formFile" name="listing[image][url]" type="file" />
+        </div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <a href="/listings/<%= listing._id %>" class="cancel-btn">Cancel</a>
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-save" style="margin-right: 0.5rem;"></i>
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
