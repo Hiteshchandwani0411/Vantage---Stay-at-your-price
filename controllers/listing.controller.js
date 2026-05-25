@@ -5,11 +5,11 @@ maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
   const allListings = await Listing.find({});
-  res.render("listings/index", { allListings });
+  res.render("listings/index", { allListings, page: "explore" });
 };
 
 module.exports.newListing = (req, res) => {
-  res.render("listings/new");
+  res.render("listings/new", { page: "host" });
 };
 
 module.exports.showListing = async (req, res) => {
@@ -63,8 +63,8 @@ module.exports.createListing = async (req, res) => {
   newListing.owner = req.user._id;
 
   newListing.geometry = {
-    type: 'Point',
-    coordinates: coordinates // [longitude, latitude]
+    type: "Point",
+    coordinates: coordinates, // [longitude, latitude]
   };
   await newListing.save();
   console.log(newListing);

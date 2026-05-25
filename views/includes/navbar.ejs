@@ -1,35 +1,98 @@
-<nav class="navbar navbar-expand-md bg-white sticky-top" style="box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border-bottom: 1px solid #e0e0e0;">
+<style>
+  /* Standard custom navlink styles */
+  .nav-link-custom {
+    color: #222222 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  /* Hover effect standard links ke liye */
+  .nav-link-custom:hover {
+    color: #fe424d !important;
+  }
+
+  /* Login button custom styling */
+  .nav-btn-login {
+    background-color: #fe424d;
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn-login:hover {
+    background-color: #e0323c;
+  }
+
+  /* Active status highlights (Jab user us page par ho) */
+  .nav-link-custom.active-page {
+    background-color: #fe424d;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    /* Agar pure button background ko highlight karna ho */
+  }
+
+  /* Host link active state (e.g., text color change or underline) */
+  .nav-link-custom.active-host {
+    color: #fe424d !important;
+    font-weight: 700;
+  }
+</style>
+
+<nav class="navbar navbar-expand-md bg-white sticky-top"
+  style="box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border-bottom: 1px solid #e0e0e0;">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/" style="font-weight: 800; font-size: 1.5rem; color: #222222; display: flex; align-items: center; gap: 0.5rem;">
+    <a class="navbar-brand" href="/listings"
+      style="font-weight: 800; font-size: 1.5rem; color: #222222; display: flex; align-items: center; gap: 0.5rem;">
       <i class="fa-regular fa-compass" style="color: #fe424d; font-size: 1.8rem;"></i>
       <span>Vantage</span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-link" aria-current="page" href="/" style="color: #222222; font-weight: 500; transition: all 0.2s ease;">Home</a>
-        <a class="nav-link" href="/listings" style="color: #222222; font-weight: 500; transition: all 0.2s ease;">Explore</a>
-        <a class="nav-link" href="/listings/new" style="color: #222222; font-weight: 500; transition: all 0.2s ease;">Host</a>
+        <a class="nav-link nav-link-custom <%= (typeof page !== 'undefined' && page === 'explore') ? 'active-page' : '' %>"
+          href="/listings">
+          Explore
+        </a>
+
+        <a class="nav-link nav-link-custom <%= (typeof page !== 'undefined' && page === 'host') ? 'active-host' : '' %>"
+          href="/listings/new">
+          Host
+        </a>
       </div>
       <div class="navbar-nav ms-auto">
         <% if (!currUser) { %>
-          <a class="nav-link" href="/signup" style="color: #222222; font-weight: 500; transition: all 0.2s ease; margin-right: 0.5rem;">Sign Up</a>
-          <a class="nav-link" href="/login" style="background-color: #fe424d; color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; transition: all 0.2s ease;">Login</a>
-        <% } %> 
-        <% if (currUser) { %>
-          <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="color: #222222; font-weight: 500;">
-              <i class="fas fa-user-circle" style="margin-right: 0.5rem;"></i><%= currUser.username %>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" style="border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-radius: 8px;">
-              <li><a class="dropdown-item" href="/listings/new">List a Property</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
-            </ul>
-          </div>
-        <% } %>
+          <a class="nav-link nav-link-custom <%= (typeof page !== 'undefined' && page === 'signup') ? 'active-page' : '' %>"
+            href="/signup" style="margin-right: 0.5rem;"> Sign Up
+          </a>
+
+          <a class="nav-link nav-btn-login <%= (typeof page !== 'undefined' && page === 'login') ? 'd-none' : '' %>"
+            href="/login">
+            Login
+          </a>
+          <% } %>
+            <% if (currUser) { %>
+              <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                  style="color: #222222; font-weight: 500;">
+                  <i class="fas fa-user-circle" style="margin-right: 0.5rem;"></i>
+                  <%= currUser.username %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end"
+                  style="border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-radius: 8px;">
+                  <li><a class="dropdown-item" href="/listings/new">List a Property</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+              </div>
+              <% } %>
       </div>
     </div>
   </div>

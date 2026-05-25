@@ -1,11 +1,11 @@
 const User = require("../models/user");
 
 module.exports.signup = (req, res) => {
-  res.render("users/signup");
+  res.render("users/signup", { page: "signup" });
 };
 
 module.exports.login = (req, res) => {
-  res.render("users/login");
+  res.render("users/login", { page: "login" });
 };
 
 module.exports.logout = (req, res, next) => {
