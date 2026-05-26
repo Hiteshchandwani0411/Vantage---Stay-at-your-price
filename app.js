@@ -9,6 +9,7 @@ const ExpressError = require("./utils/ExpressError");
 const listingRouter = require("./router/listings");
 const reviewRouter = require("./router/reviews");
 const userRouter = require("./router/users");
+const wishlistRouter = require("./router/wishlist");
 const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
@@ -50,10 +51,6 @@ async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
 }
 
-app.get("/", (req, res) => {
-  res.send("Home Route");
-});
-
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -64,6 +61,7 @@ app.use((req, res, next) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+app.use("/user", wishlistRouter);
 
 app.all("/*path", (req, res, next) => {
   next(new ExpressError(404, "Page not found"));
