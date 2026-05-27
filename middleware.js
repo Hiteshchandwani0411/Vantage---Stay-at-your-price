@@ -5,6 +5,13 @@ const { listingSchema, reviewSchema } = require("./schema");
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
+    if (req.originalUrl.includes("wishlist")) {
+      return res.status(401).json({
+        success: false,
+        error: "Please login first to modify your wishlist!",
+      });
+    }
+
     req.session.redirectUrl = req.originalUrl;
     req.flash("error", "User must be logged in First!");
     return res.redirect("/login");

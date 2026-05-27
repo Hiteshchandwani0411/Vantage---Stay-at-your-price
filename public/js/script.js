@@ -32,6 +32,16 @@
 // frontend-script.js
 const wishlistButtons = document.querySelectorAll(".wishlist-btn");
 
+// Helper function ko upar ya bahar rakhna better hai
+function showFlashMessage(message, type) {
+  const flashContainer = document.getElementById("flash-container") || document.body;
+  const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show fixed-top mx-auto mt-3" style="max-width: 500px; z-index: 9999;" role="alert">
+                      ${message}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+  flashContainer.insertAdjacentHTML("beforeend", alertHtml);
+}
+
 wishlistButtons.forEach((button) => {
   button.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -41,7 +51,6 @@ wishlistButtons.forEach((button) => {
     // 1. Loading State: Disable click temporary
     button.style.pointerEvents = "none";
 
-    // Check ki current state kya hai (add karna hai ya remove)
     const isCurrentlyActive = button.classList.contains("active");
     const url = isCurrentlyActive
       ? `/user/wishlist/remove/${listingId}`
@@ -51,10 +60,24 @@ wishlistButtons.forEach((button) => {
     try {
       // 2. Backend API Call
       const response = await fetch(url, { method: method });
+      
+      // Response ko sirf EK baar json mein convert karenge
       const result = await response.json();
 
+      // 3. Check for unauthorized error (Not Logged In)
+      if (response.status === 401) {
+        // Yahan se dobara response.json() hata diya, 'result.error' direct use hoga
+        showFlashMessage(result.error || "Please login first!", "danger");
+
+        // 1.5 seconds ka wait karenge taaki user message padh le
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1500);
+        return; 
+      }
+
+      // 4. Check if Request was Successful
       if (response.ok) {
-        // 3. UI Update (Bina page reload kiye)
         if (isCurrentlyActive) {
           button.classList.remove("active");
           icon.className = "fa-regular fa-heart"; // Empty Heart
@@ -63,13 +86,13 @@ wishlistButtons.forEach((button) => {
           icon.className = "fa-solid fa-heart text-danger"; // Red Heart
         }
       } else {
-        alert(result.error || "Something went wrong!");
+        // Kisi aur error ke liye (jaise limit full hona)
+        showFlashMessage(result.error || "Something went wrong!", "warning");
       }
-      console.log(response);
     } catch (err) {
       console.error("Wishlist Error:", err);
     } finally {
-      // 4. Reset Loading State
+      // 5. Reset Loading State
       button.style.pointerEvents = "auto";
     }
   });
