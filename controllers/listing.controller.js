@@ -1,11 +1,40 @@
 const Listing = require("../models/listing");
+const Wishlist = require("../models/wishlist");
 const { listingSchema } = require("../schema");
 const maptilerClient = require("@maptiler/client");
 maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listings/index", { allListings, page: "explore" });
+  try {
+    const allListings = await Listing.find({});
+    let wishlistedIds = [];
+
+    if (req.user) {
+      const userWishlist = await Wishlist.find({ userId: req.user._id }).select(
+        "listingId",
+      );
+      // Hum sirf listingIds ka ek simple array bana rahe hain easy comparison ke liye
+      // e.g., ['65f1a2b3...', '65f1a2b4...']
+      wishlistedIds = userWishlist.map((item) => item.listingId.toString());
+    }
+
+    const listingsWithWishlistFlag = allListings.map((listing) => {
+      // Mongoose object ko plain JavaScript object mein convert karte hain taaki nayi property add kar sakein
+      const listingObj = listing.toObject();
+
+      // Agar user logged in hai aur uski wishlist mein yeh id hai, toh true, varna false
+      listingObj.isWishlisted = wishlistedIds.includes(listing._id.toString());
+
+      return listingObj;
+    });
+    res.render("listings/index", {
+      allListings: listingsWithWishlistFlag,
+      page: "explore",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 module.exports.newListing = (req, res) => {

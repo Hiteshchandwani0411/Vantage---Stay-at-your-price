@@ -1,25 +1,22 @@
 const Wishlist = require("../models/wishlist");
 
 module.exports.addToWishlist = async (req, res) => {
-    try {
+  try {
+    let listingId = req.params.listingId;
+    let userId = req.user ? req.user._id : "65f1a2b3c4d5e6f7a8b9c0d1";
 
-        let listingId = req.params.listingId;
-        let userId = req.user ? req.user._id : "65f1a2b3c4d5e6f7a8b9c0d1";
-      
-        await Wishlist.create({
-          userId,
-          listingId,
-        });
-      
-        res
-          .status(201)
-          .json({
-            success: true,
-            message: "Added to wishlist",
-          });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+    await Wishlist.create({
+      userId,
+      listingId,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Added to wishlist",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 };
 
 module.exports.removeListing = async (req, res) => {

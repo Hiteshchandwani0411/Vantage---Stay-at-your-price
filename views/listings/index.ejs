@@ -237,8 +237,8 @@
                             </div>
                         <% } %>
                         
-                        <button class="save-btn" onclick="event.preventDefault(); alert('Added to wishlist!');">
-                            <i class="far fa-heart" style="font-size: 1.2rem; color: #222222;"></i>
+                        <button class="save-btn wishlist-btn <%= listing.isWishlisted ? 'active' : '' %>" data-id="<%= listing._id %>">
+                            <i class="far fa-heart <%= listing.isWishlisted ? 'fa-solid text-danger' : 'fa-regular' %>" style="font-size: 1.2rem; color: #222222;"></i>
                         </button>
                     </div>
 
