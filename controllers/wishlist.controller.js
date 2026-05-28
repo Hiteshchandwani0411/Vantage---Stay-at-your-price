@@ -1,5 +1,15 @@
 const Wishlist = require("../models/wishlist");
 
+module.exports.getWishlistPage = async (req, res) => {
+  let userId = req.user._id;
+
+  let wishlist = await Wishlist.find({ userId: userId }).populate(
+    "listingId",
+  );
+
+  res.render("users/wishlist", { wishlist });
+};
+
 module.exports.addToWishlist = async (req, res) => {
   try {
     let listingId = req.params.listingId;

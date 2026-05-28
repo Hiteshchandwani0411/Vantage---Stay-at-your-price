@@ -1,0 +1,284 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .wishlist-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .wishlist-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .wishlist-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #222222;
+    margin: 0;
+    letter-spacing: -0.5px;
+  }
+
+  .wishlist-subtext {
+    color: #717171;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+  }
+
+  @media (max-width: 1200px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.8rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .wishlist-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .wishlist-header h1 {
+      font-size: 1.8rem;
+    }
+  }
+
+  .wishlist-item {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+
+  .wishlist-item:hover {
+    transform: translateY(-8px);
+  }
+
+  .item-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    aspect-ratio: 1;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .wishlist-item:hover .item-image-wrapper {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .wishlist-item:hover .item-image {
+    transform: scale(1.05);
+  }
+
+  .remove-from-wishlist {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .remove-from-wishlist:hover {
+    background-color: #fe424d;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222222;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .item-location {
+    font-size: 0.875rem;
+    color: #717171;
+    margin-bottom: 0.75rem;
+  }
+
+  .item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .item-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: #222222;
+  }
+
+  .item-rating .star {
+    color: #ffb500;
+  }
+
+  .item-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222222;
+    text-align: right;
+  }
+
+  .price-label {
+    font-size: 0.75rem;
+    color: #717171;
+    font-weight: 400;
+  }
+
+  .empty-wishlist {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #717171;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    color: #d0d0d0;
+    margin-bottom: 1rem;
+  }
+
+  .empty-wishlist h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #222222;
+  }
+
+  .empty-wishlist p {
+    margin-bottom: 1.5rem;
+  }
+
+  .explore-btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    background-color: #fe424d;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .explore-btn:hover {
+    background-color: #e63840;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(254, 66, 77, 0.3);
+  }
+</style>
+
+<div class="wishlist-container">
+  <div class="wishlist-header">
+    <h1><i class="fas fa-heart" style="color: #fe424d; margin-right: 0.5rem;"></i>My Wishlist</h1>
+    <p class="wishlist-subtext">Your saved favorite listings</p>
+  </div>
+
+  <% if (wishlist && wishlist.length > 0) { %>
+    <div class="wishlist-grid">
+      <% for (const listing of wishlist.listingId) { %>
+        <a href="/listings/<%= listing._id %>" class="wishlist-item">
+          <div class="item-image-wrapper">
+            <img 
+              src="<%= listing.image.url %>" 
+              onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1773062177647-76cf543b1795?q=80&w=1470&auto=format&fit=crop';" 
+              class="item-image" 
+              alt="<%= listing.title %>"
+            >
+            <button class="remove-from-wishlist">
+              <i class="fas fa-heart" style="color: #fe424d; font-size: 1.2rem;"></i>
+            </button>
+          </div>
+
+          <div class="item-info">
+            <h3 class="item-title"><%= listing.title %></h3>
+            
+            <p class="item-location">
+              <i class="fas fa-map-marker-alt" style="color: #fe424d; margin-right: 0.5rem;"></i>
+              <%= listing.location %>
+            </p>
+
+            <div class="item-footer">
+              <div class="item-rating">
+                <% if (listing.reviews && listing.reviews.length > 0) { %>
+                  <i class="fas fa-star star"></i>
+                  <span style="margin-left: 0.25rem;">(<span style="color: #717171;"><%= listing.reviews.length %></span>)</span>
+                <% } else { %>
+                  <span style="color: #717171; font-size: 0.875rem;">New</span>
+                <% } %>
+              </div>
+              <div class="item-price">
+                &#8377; <strong><%= listing.price.toLocaleString("en-IN") %></strong>
+                <div class="price-label">/ night</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="empty-wishlist">
+      <div class="empty-icon">
+        <i class="far fa-heart"></i>
+      </div>
+      <h2>Your Wishlist is Empty</h2>
+      <p>Start adding your favorite listings to save them for later</p>
+      <a href="/listings" class="explore-btn">
+        <i class="fas fa-compass" style="margin-right: 0.5rem;"></i>
+        Explore Listings
+      </a>
+    </div>
+  <% } %>
+</div>

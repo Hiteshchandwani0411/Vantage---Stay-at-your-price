@@ -61,7 +61,7 @@ app.use((req, res, next) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
-app.use("/user", wishlistRouter);
+app.use("/user/wishlist", wishlistRouter);
 
 app.all("/*path", (req, res, next) => {
   next(new ExpressError(404, "Page not found"));
