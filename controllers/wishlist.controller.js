@@ -7,6 +7,7 @@ module.exports.getWishlistPage = async (req, res) => {
     "listingId",
   );
 
+  console.log(wishlist);
   res.render("users/wishlist", { wishlist });
 };
 

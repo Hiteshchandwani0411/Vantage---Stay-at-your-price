@@ -99,30 +99,6 @@
     transform: scale(1.05);
   }
 
-  .remove-from-wishlist {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background-color: white;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    z-index: 2;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .remove-from-wishlist:hover {
-    background-color: #fe424d;
-    color: white;
-    transform: scale(1.1);
-  }
-
   .item-info {
     flex: 1;
     display: flex;
@@ -228,39 +204,40 @@
 
   <% if (wishlist && wishlist.length > 0) { %>
     <div class="wishlist-grid">
-      <% for (const listing of wishlist.listingId) { %>
-        <a href="/listings/<%= listing._id %>" class="wishlist-item">
-          <div class="item-image-wrapper">
+      <% for (const item of wishlist) { %>
+        <a href="/listings/<%= item.listingId._id %>" class="wishlist-item" id="card-<%= item.listingId._id %>">
+          <div class="item-image-wrapper" >
             <img 
-              src="<%= listing.image.url %>" 
+              src="<%= item.listingId.image.url %>" 
               onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1773062177647-76cf543b1795?q=80&w=1470&auto=format&fit=crop';" 
               class="item-image" 
-              alt="<%= listing.title %>"
+              alt="<%= item.listingId.title %>"
             >
-            <button class="remove-from-wishlist">
-              <i class="fas fa-heart" style="color: #fe424d; font-size: 1.2rem;"></i>
+
+            <button class="save-btn wishlist-btn active remove-wishlist" data-id="<%= item.listingId._id %>">
+                <i class="far fa-heart fa-solid text-danger" style="font-size: 1.2rem; color: #222222;"></i>
             </button>
           </div>
 
           <div class="item-info">
-            <h3 class="item-title"><%= listing.title %></h3>
+            <h3 class="item-title"><%= item.listingId.title %></h3>
             
             <p class="item-location">
               <i class="fas fa-map-marker-alt" style="color: #fe424d; margin-right: 0.5rem;"></i>
-              <%= listing.location %>
+              <%= item.listingId.location %>
             </p>
 
             <div class="item-footer">
               <div class="item-rating">
-                <% if (listing.reviews && listing.reviews.length > 0) { %>
+                <% if (item.listingId.reviews && item.listingId.reviews.length > 0) { %>
                   <i class="fas fa-star star"></i>
-                  <span style="margin-left: 0.25rem;">(<span style="color: #717171;"><%= listing.reviews.length %></span>)</span>
+                  <span style="margin-left: 0.25rem;">(<span style="color: #717171;"><%= item.listingId.reviews.length %></span>)</span>
                 <% } else { %>
                   <span style="color: #717171; font-size: 0.875rem;">New</span>
                 <% } %>
               </div>
               <div class="item-price">
-                &#8377; <strong><%= listing.price.toLocaleString("en-IN") %></strong>
+                &#8377; <strong><%= item.listingId.price.toLocaleString("en-IN") %></strong>
                 <div class="price-label">/ night</div>
               </div>
             </div>
