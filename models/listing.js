@@ -1,6 +1,35 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Review = require("./review");
+const { string } = require("joi");
+
+const categoriesEnum = [
+  "trending",
+  "farms",
+  "beach",
+  "iconic",
+  "luxury",
+  "mountains",
+  "desert",
+  "forest",
+  "adventure",
+  "pet-friendly",
+  "lake",
+  "camping",
+  "treehouse",
+  "villa",
+  "ski",
+  "island",
+  "cave",
+  "boat",
+  "castle",
+  "tiny-home",
+  "countryside",
+  "pool",
+  "glamping",
+  "heritage",
+  "wellness",
+];
 
 const listingSchema = new Schema(
   {
@@ -19,9 +48,9 @@ const listingSchema = new Schema(
         default:
           "https://images.unsplash.com/photo-1773062177647-76cf543b1795?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         set: (v) =>
-          (v === ""
+          v === ""
             ? "https://images.unsplash.com/photo-1773062177647-76cf543b1795?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            : v),
+            : v,
       },
       filename: {
         type: String,
@@ -33,18 +62,24 @@ const listingSchema = new Schema(
       min: [0, "Price cannot be negative"],
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+      enum: categoriesEnum,
+      lowercase: true,
+    },
     location: String,
     geometry: {
       type: {
-        type: String, 
-        enum: ['Point'],
+        type: String,
+        enum: ["Point"],
         required: true,
-        default: 'Point'
+        default: "Point",
       },
       coordinates: {
         type: [Number],
-        required: true
-      }
+        required: true,
+      },
     },
     country: {
       type: String,
@@ -56,7 +91,7 @@ const listingSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
-    }
+    },
   },
   { timestamps: true },
 );
