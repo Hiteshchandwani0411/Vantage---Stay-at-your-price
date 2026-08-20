@@ -3,12 +3,15 @@ const router = express.Router();
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware");
 const {
+  home,
   signup,
   login,
   logout,
   registerUser,
   loginUser,
 } = require("../controllers/user.controller");
+
+router.get("/", home);
 
 router.route("/signup").get(signup).post(registerUser);
 
