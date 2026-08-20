@@ -6,31 +6,42 @@ maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
   try {
-    const allListings = await Listing.find({});
-    let wishlistedIds = [];
+    // URL se query extract ki: e.g., /listings?category=farms
+    const { category } = req.query; 
+    let allListings = [];
 
+    // 1. Category Query Filtering Logic
+    if (!category || category === "trending") {
+      // Agar URL me koi query nahi hai (?category= nahi hai) ya fir 'trending' hai
+      allListings = await Listing.find({});
+    } else {
+      // Agar specific category aayi hai, toh exact match ya regex filter chalao
+      allListings = await Listing.find({
+        category: { $regex: new RegExp(category, "i") } // Case-insensitive search
+      });
+    }
+
+    // 2. Wishlist logic (Perfect as always)
+    let wishlistedIds = [];
     if (req.user) {
-      const userWishlist = await Wishlist.find({ userId: req.user._id }).select(
-        "listingId",
-      );
-      // Hum sirf listingIds ka ek simple array bana rahe hain easy comparison ke liye
-      // e.g., ['65f1a2b3...', '65f1a2b4...']
+      const userWishlist = await Wishlist.find({ userId: req.user._id }).select("listingId");
       wishlistedIds = userWishlist.map((item) => item.listingId.toString());
     }
 
+    // 3. Adding the isWishlisted flag
     const listingsWithWishlistFlag = allListings.map((listing) => {
-      // Mongoose object ko plain JavaScript object mein convert karte hain taaki nayi property add kar sakein
       const listingObj = listing.toObject();
-
-      // Agar user logged in hai aur uski wishlist mein yeh id hai, toh true, varna false
       listingObj.isWishlisted = wishlistedIds.includes(listing._id.toString());
-
       return listingObj;
     });
+
+    // 4. Render response
     res.render("listings/index", {
       allListings: listingsWithWishlistFlag,
       page: "explore",
+      currentCategory: category || "trending" // Isse frontend par active category highlight kar sakte ho
     });
+
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal Server Error");

@@ -11,6 +11,7 @@ const reviewRouter = require("./router/reviews");
 const userRouter = require("./router/users");
 const wishlistRouter = require("./router/wishlist");
 const session = require("express-session");
+// const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -25,11 +26,24 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.engine("ejs", ejsMate);
 
+const MongoStorePkg = require('connect-mongo');
+const MongoStore = MongoStorePkg.default || MongoStorePkg;
+const store = MongoStore.create({
+  mongoUrl: process.env.MONGODB_URL,
+  crypto: { secret: process.env.SECRET_KEY },
+  touchAfter: 24 * 3600
+});
+
 const sessionOptions = {
+  store,
   secret: process.env.SECRET_KEY,
   resave: false,
   saveUninitialized: true,
 };
+
+store.on("error", () => {
+  console.log("ERROR in MONGO SESSION STORE", err);
+})
 
 const port = process.env.PORT;
 app.use(session(sessionOptions));

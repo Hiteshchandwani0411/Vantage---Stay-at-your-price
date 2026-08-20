@@ -62,12 +62,12 @@ const listingSchema = new Schema(
       min: [0, "Price cannot be negative"],
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-      enum: categoriesEnum,
-      lowercase: true,
-    },
+    // category: {
+    //   type: String,
+    //   required: true,
+    //   enum: categoriesEnum,
+    //   lowercase: true,
+    // },
     location: String,
     geometry: {
       type: {
