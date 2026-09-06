@@ -8,6 +8,7 @@
 
     <% if (allListings.length > 0) { %>
         <div class="listings-container">
+            
             <% for (const listing of allListings) { %>
                 <a href="/listings/<%= listing._id %>" class="listing-card">
                     <div class="listing-image-wrapper">

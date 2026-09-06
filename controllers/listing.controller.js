@@ -13,12 +13,12 @@ module.exports.index = async (req, res) => {
     // 1. Category Query Filtering Logic
     if (!category || category === "trending") {
       // Agar URL me koi query nahi hai (?category= nahi hai) ya fir 'trending' hai
-      allListings = await Listing.find({});
+      allListings = await Listing.find({}).populate("reviews");
     } else {
       // Agar specific category aayi hai, toh exact match ya regex filter chalao
       allListings = await Listing.find({
         category: { $regex: new RegExp(category, "i") } // Case-insensitive search
-      });
+      }).populate("reviews");
     }
 
     // 2. Wishlist logic (Perfect as always)
@@ -62,7 +62,7 @@ module.exports.showListing = async (req, res) => {
     return res.redirect("/listings");
   }
   console.log(listing);
-  res.render("listings/show", { listing });
+  res.render("listings/show", { listing, page: "explore" });
 };
 
 module.exports.editListing = async (req, res) => {
@@ -75,7 +75,7 @@ module.exports.editListing = async (req, res) => {
 
   let originalImageUrl = listing.image.url;
   originalImageUrl = originalImageUrl.replace("/upload", "/upload");
-  res.render("listings/edit", { listing, originalImageUrl });
+  res.render("listings/edit", { listing, originalImageUrl, page: "host" });
 };
 
 module.exports.createListing = async (req, res) => {

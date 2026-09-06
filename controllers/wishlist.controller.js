@@ -8,7 +8,7 @@ module.exports.getWishlistPage = async (req, res) => {
   );
 
   console.log(wishlist);
-  res.render("users/wishlist", { wishlist });
+  res.render("users/wishlist", { wishlist, page: "wishlist" });
 };
 
 module.exports.addToWishlist = async (req, res) => {
