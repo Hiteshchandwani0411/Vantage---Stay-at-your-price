@@ -4,6 +4,7 @@ require("dotenv").config({
 const mongoose = require("mongoose");
 const initData = require("./data");
 const Listing = require("../models/listing");
+const categories = require("../utils/categories");
 
 main()
   .then(() => {
@@ -22,10 +23,15 @@ async function main() {
 const initDB = async () => {
   await Listing.deleteMany({});
 
-  initData.data = initData.data.map((obj) => ({
-    ...obj,
-    owner: "6a341058c723f8c796587088",
-  }));
+  initData.data = initData.data.map((obj) => {
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+
+    return {
+      ...obj,
+      owner: "6a341058c723f8c796587088",
+      category: randomCategory.value,
+    };
+  });
 
   await Listing.insertMany(initData.data);
   console.log("Database Initialized");
