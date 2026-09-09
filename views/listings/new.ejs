@@ -125,6 +125,12 @@
     background-color: rgba(254, 66, 77, 0.02);
   }
 
+  .file-input-label.dragover {
+    border-color: #fe424d;
+    background-color: rgba(254, 66, 77, 0.06);
+    box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.1);
+  }
+
   .file-input-label i {
     font-size: 1.8rem;
     color: #fe424d;
@@ -163,6 +169,149 @@
 
   .form-control.is-valid ~ .valid-feedback {
     display: block;
+  }
+
+  .image-preview-container {
+    display: none;
+    margin-top: 1rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fafafa;
+    animation: previewFadeIn 0.3s ease;
+  }
+
+  @keyframes previewFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .image-preview-wrapper {
+    position: relative;
+    width: 100%;
+    max-height: 350px;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .image-preview-wrapper img {
+    width: 100%;
+    height: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .image-preview-remove {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(34, 34, 34, 0.7);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+  }
+
+  .image-preview-remove:hover {
+    background: #fe424d;
+    transform: scale(1.1);
+  }
+
+  .image-preview-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e0e0e0;
+    background: #fff;
+  }
+
+  .image-preview-file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  .image-preview-file-info i {
+    color: #fe424d;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .image-preview-file-name {
+    font-weight: 600;
+    color: #222222;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .image-preview-file-size {
+    color: #717171;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+  }
+
+  .image-preview-change-btn {
+    background: none;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #222222;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .image-preview-change-btn:hover {
+    border-color: #fe424d;
+    color: #fe424d;
+  }
+
+  .select-wrapper {
+    position: relative;
+  }
+
+  .category-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.75rem;
+    cursor: pointer;
+    color: #222222;
+  }
+
+  .category-select option {
+    color: #222222;
+  }
+
+  .category-select:invalid {
+    color: #717171;
+  }
+
+  .select-wrapper .select-chevron {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #717171;
+    pointer-events: none;
+    font-size: 0.75rem;
   }
 </style>
 
@@ -263,6 +412,33 @@
       </div>
     </div>
 
+    <!-- Category Section -->
+    <div class="form-section">
+      <h2 class="form-section-title">🏷️ Category</h2>
+
+      <div class="form-group">
+        <label for="category" class="form-label">
+          Property Category <span class="required">*</span>
+        </label>
+        <div class="select-wrapper">
+          <select
+            id="category"
+            name="listing[category]"
+            class="form-control category-select"
+            required
+          >
+            <option value="" disabled selected>Select a category...</option>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.value %>"><%= cat.label %></option>
+            <% }) %>
+          </select>
+          <i class="fas fa-chevron-down select-chevron"></i>
+        </div>
+        <span class="form-help-text">Choose the category that best describes your property</span>
+        <div class="invalid-feedback">Please select a category</div>
+      </div>
+    </div>
+
     <!-- Image Section -->
     <div class="form-section">
       <h2 class="form-section-title">🖼️ Property Image</h2>
@@ -279,6 +455,31 @@
           </label>
           <input class="form-control" id="formFile" name="listing[image][url]" type="file" />
         </div>
+
+        <div class="image-preview-container" id="imagePreviewContainer">
+          <div class="image-preview-wrapper">
+            <img id="imagePreview" src="#" alt="Image preview" />
+            <button
+              type="button"
+              class="image-preview-remove"
+              id="imagePreviewRemove"
+              title="Remove image"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="image-preview-info">
+            <span class="image-preview-file-info">
+              <i class="fas fa-file-image"></i>
+              <span class="image-preview-file-name" id="imagePreviewName">image.jpg</span>
+              <span class="image-preview-file-size" id="imagePreviewSize"></span>
+            </span>
+            <button type="button" class="image-preview-change-btn" id="imagePreviewChange">
+              <i class="fas fa-sync-alt" style="margin-right: 0.3rem;"></i>
+              Change
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -290,3 +491,104 @@
 </div>
 
 <script src="/js/script.js"></script>
+
+<script>
+  (() => {
+    const fileInput = document.getElementById("formFile");
+    const previewContainer = document.getElementById("imagePreviewContainer");
+    const previewImage = document.getElementById("imagePreview");
+    const previewName = document.getElementById("imagePreviewName");
+    const previewSize = document.getElementById("imagePreviewSize");
+    const removeBtn = document.getElementById("imagePreviewRemove");
+    const changeBtn = document.getElementById("imagePreviewChange");
+    const uploadLabel = document.querySelector(".file-input-label");
+
+    const MAX_SIZE = 10 * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];
+    let previewUrl = null;
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function showPreview(file) {
+      if (!file) return;
+
+      previewName.textContent = file.name;
+      previewSize.textContent = formatFileSize(file.size);
+
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = URL.createObjectURL(file);
+      previewImage.src = previewUrl;
+
+      previewContainer.style.display = "block";
+      uploadLabel.style.display = "none";
+    }
+
+    function resetPreview() {
+      fileInput.value = "";
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+      previewImage.removeAttribute("src");
+      previewContainer.style.display = "none";
+      uploadLabel.style.display = "flex";
+    }
+
+    function validateFile(file) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        showFlashMessage(
+          "Invalid file type. Please upload a JPG or PNG image.",
+          "warning"
+        );
+        return false;
+      }
+      if (file.size > MAX_SIZE) {
+        showFlashMessage(
+          "File too large. Maximum size allowed is 10MB.",
+          "warning"
+        );
+        return false;
+      }
+      return true;
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      if (!validateFile(file)) {
+        resetPreview();
+        return;
+      }
+      showPreview(file);
+    }
+
+    fileInput.addEventListener("change", () => {
+      handleFile(fileInput.files[0]);
+    });
+
+    removeBtn.addEventListener("click", resetPreview);
+
+    changeBtn.addEventListener("click", () => fileInput.click());
+
+    uploadLabel.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      uploadLabel.classList.add("dragover");
+    });
+
+    uploadLabel.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadLabel.classList.add("dragover");
+    });
+
+    uploadLabel.addEventListener("dragleave", () => {
+      uploadLabel.classList.remove("dragover");
+    });
+
+    uploadLabel.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadLabel.classList.remove("dragover");
+      handleFile(e.dataTransfer.files[0]);
+    });
+  })();
+</script>

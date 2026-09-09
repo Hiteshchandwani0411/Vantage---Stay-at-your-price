@@ -21,15 +21,6 @@
   });
 })();
 
-// document.getElementById("image").onchange = function (evt) {
-//   const [file] = this.files;
-//   if (file) {
-//     // Preview wali image ki src change kar dega
-//     document.querySelector(".preview-img").src = URL.createObjectURL(file);
-//   }
-// };
-
-// frontend-script.js
 const wishlistButtons = document.querySelectorAll(".add-remove-wishlist");
 const wishlistPageButtons = document.querySelectorAll(".remove-wishlist");
 
