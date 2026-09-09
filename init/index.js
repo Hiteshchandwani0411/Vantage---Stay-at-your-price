@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const initData = require("./data");
 const Listing = require("../models/listing");
 const categories = require("../utils/categories");
+const maptilerClient = require("@maptiler/client");
+maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 main()
   .then(() => {
@@ -23,17 +25,35 @@ async function main() {
 const initDB = async () => {
   await Listing.deleteMany({});
 
-  initData.data = initData.data.map((obj) => {
+  const listings = [];
+  for (const obj of initData.data) {
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
-    return {
+    let coordinates = [0, 0];
+    try {
+      const queryText = `${obj.location}, ${obj.country}`;
+      const geocodeResult = await maptilerClient.geocoding.forward(queryText, {
+        limit: 1,
+      });
+      if (geocodeResult.features && geocodeResult.features[0]) {
+        coordinates = geocodeResult.features[0].geometry.coordinates;
+      }
+    } catch (err) {
+      console.log(`Geocoding failed for "${obj.title}":`, err.message);
+    }
+
+    listings.push({
       ...obj,
       owner: "6a341058c723f8c796587088",
       category: randomCategory.value,
-    };
-  });
+      geometry: {
+        type: "Point",
+        coordinates: coordinates,
+      },
+    });
+  }
 
-  await Listing.insertMany(initData.data);
+  await Listing.insertMany(listings);
   console.log("Database Initialized");
 };
 
