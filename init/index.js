@@ -4,6 +4,7 @@ require("dotenv").config({
 const mongoose = require("mongoose");
 const initData = require("./data");
 const Listing = require("../models/listing");
+const Wishlist = require("../models/wishlist");
 const categories = require("../utils/categories");
 const maptilerClient = require("@maptiler/client");
 maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
@@ -24,6 +25,9 @@ async function main() {
 
 const initDB = async () => {
   await Listing.deleteMany({});
+
+  // Remove wishlist entries referencing the deleted listings
+  await Wishlist.deleteMany({});
 
   const listings = [];
   for (const obj of initData.data) {

@@ -7,6 +7,9 @@ module.exports.getWishlistPage = async (req, res) => {
     "listingId",
   );
 
+  // Filter out entries whose listing was deleted (populate yields null)
+  wishlist = wishlist.filter((item) => item.listingId !== null);
+
   console.log(wishlist);
   res.render("users/wishlist", { wishlist, page: "wishlist" });
 };
