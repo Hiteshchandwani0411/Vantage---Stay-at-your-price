@@ -6,40 +6,86 @@ maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
   try {
-    // URL se query extract ki: e.g., /listings?category=farms
-    const { category } = req.query; 
-    let allListings = [];
+    const PAGE_SIZE = 12;
+    const { category, search, sort } = req.query;
+    const currentPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
-    // 1. Category Query Filtering Logic
-    if (!category || category === "trending") {
-      // Agar URL me koi query nahi hai (?category= nahi hai) ya fir 'trending' hai
-      allListings = await Listing.find({}).populate("reviews");
-    } else {
-      // Agar specific category aayi hai, toh exact match ya regex filter chalao
-      allListings = await Listing.find({
-        category: { $regex: new RegExp(category, "i") } // Case-insensitive search
-      }).populate("reviews");
+    const filter = {};
+
+    // 1. Category Query Filtering
+    if (category && category !== "trending") {
+      filter.category = { $regex: new RegExp(category, "i") };
     }
 
-    // 2. Wishlist logic (Perfect as always)
+    // 2. Text search across title/location/description/country
+    if (search && search.trim()) {
+      const regex = new RegExp(search.trim(), "i");
+      filter.$or = [
+        { title: regex },
+        { location: regex },
+        { country: regex },
+        { description: regex },
+      ];
+    }
+
+    // 3. Sorting (rating is applied in memory after reviews populate)
+    let sortOption = { createdAt: -1 };
+    if (sort === "price_asc") sortOption = { price: 1 };
+    else if (sort === "price_desc") sortOption = { price: -1 };
+
+    // 4. Pagination
+    const totalListings = await Listing.countDocuments(filter);
+    const totalPages = Math.max(Math.ceil(totalListings / PAGE_SIZE), 1);
+    const safePage = Math.min(currentPage, totalPages);
+
+    let allListings = await Listing.find(filter)
+      .sort(sortOption)
+      .skip((safePage - 1) * PAGE_SIZE)
+      .limit(PAGE_SIZE)
+      .populate("reviews");
+
+    // 5. Wishlist logic
     let wishlistedIds = [];
     if (req.user) {
       const userWishlist = await Wishlist.find({ userId: req.user._id }).select("listingId");
       wishlistedIds = userWishlist.map((item) => item.listingId.toString());
     }
 
-    // 3. Adding the isWishlisted flag
-    const listingsWithWishlistFlag = allListings.map((listing) => {
+    // 6. Add isWishlisted flag + average rating (needed for rating sort)
+    let listingsWithWishlistFlag = allListings.map((listing) => {
       const listingObj = listing.toObject();
       listingObj.isWishlisted = wishlistedIds.includes(listing._id.toString());
+      listingObj.avgRating = listingObj.reviews.length
+        ? listingObj.reviews.reduce((sum, r) => sum + r.rating, 0) / listingObj.reviews.length
+        : 0;
       return listingObj;
     });
 
-    // 4. Render response
+    if (sort === "rating") {
+      listingsWithWishlistFlag.sort((a, b) => b.avgRating - a.avgRating);
+    }
+
+    // 7. Helper to rebuild query string preserving search/category/sort state
+    const buildQuery = ({ page } = {}) => {
+      const params = new URLSearchParams();
+      if (search && search.trim()) params.set("search", search.trim());
+      if (category && category !== "trending") params.set("category", category);
+      if (sort && sort !== "newest") params.set("sort", sort);
+      params.set("page", page || 1);
+      return params.toString();
+    };
+
+    // 8. Render response
     res.render("listings/index", {
       allListings: listingsWithWishlistFlag,
       page: "explore",
-      currentCategory: category || "trending" // Isse frontend par active category highlight kar sakte ho
+      currentCategory: category || "trending",
+      search: search || "",
+      sort: sort || "newest",
+      currentPage: safePage,
+      totalPages,
+      totalResults: totalListings,
+      paginationQuery: (p) => buildQuery({ page: p }),
     });
 
   } catch (error) {
@@ -50,6 +96,40 @@ module.exports.index = async (req, res) => {
 
 module.exports.newListing = (req, res) => {
   res.render("listings/new", { page: "host" });
+};
+
+module.exports.showSuggestions = async (req, res) => {
+  const term = (req.query.search || "").trim();
+  if (term.length < 2) {
+    return res.json({ suggestions: [] });
+  }
+
+  const regex = new RegExp(term, "i");
+  const listings = await Listing.find({
+    $or: [
+      { title: regex },
+      { location: regex },
+      { country: regex },
+      { description: regex },
+    ],
+  })
+    .limit(8)
+    .select("title location country price image")
+    .populate("reviews");
+
+  res.json({
+    suggestions: listings.map((l) => ({
+      _id: l._id,
+      title: l.title,
+      location: l.location,
+      country: l.country,
+      price: l.price,
+      image: l.image.url,
+      avgRating: l.reviews.length
+        ? (l.reviews.reduce((sum, r) => sum + r.rating, 0) / l.reviews.length).toFixed(2)
+        : null,
+    })),
+  });
 };
 
 module.exports.showListing = async (req, res) => {
@@ -89,7 +169,7 @@ module.exports.createListing = async (req, res) => {
   });
 
   if (!geocodeResult.features || geocodeResult.features.length === 0) {
-    req.flash("error", "Valid location nahi mil saki!");
+    req.flash("error", "No Valid location found!");
     return res.redirect("/listings/new");
   }
 

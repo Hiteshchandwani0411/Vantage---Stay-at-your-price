@@ -12,7 +12,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
-      <div class="navbar-search-wrap flex-grow-1 mx-md-3">
+      <div class="navbar-search-wrap flex-grow-1 mx-md-3" id="searchContainer">
         <form class="navbar-search" role="search" action="/listings" method="get">
           <div class="input-group">
             <span class="input-group-text">
@@ -22,11 +22,18 @@
               class="form-control"
               type="search" 
               name="search"
+              value="<%= typeof currentQuery !== 'undefined' && currentQuery.search ? currentQuery.search : '' %>"
               placeholder="Search by location..."
               aria-label="Search"
+              autocomplete="off"
+              aria-expanded="false"
+              aria-controls="searchSuggestions"
             />
           </div>
         </form>
+        <div class="search-suggestions" id="searchSuggestions" hidden>
+          <div class="search-suggestions-list" id="searchSuggestionsList"></div>
+        </div>
       </div>
 
       <div class="navbar-nav navbar-links">

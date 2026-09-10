@@ -143,8 +143,12 @@
   <div class="categories-container-inner" id="categoriesScroll">
     <div class="categories-wrapper">
       <% categories.forEach(cat => { %>
-            
-        <a href="/listings?category=<%= cat.value %>" 
+        <%
+          const qs = new URLSearchParams({ category: cat.value, page: 1 });
+          if (typeof currentQuery !== 'undefined' && currentQuery.search) qs.set('search', currentQuery.search);
+          if (typeof currentQuery !== 'undefined' && currentQuery.sort && currentQuery.sort !== 'newest') qs.set('sort', currentQuery.sort);
+        %>
+        <a href="/listings?<%= qs.toString() %>" 
             class="category-item <%= selectedCategory === cat.value ? 'active' : '' %>">
             
             <div class="category-icon">

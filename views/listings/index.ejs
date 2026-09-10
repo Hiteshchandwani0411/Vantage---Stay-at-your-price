@@ -3,7 +3,23 @@
 
 <div class="listings-page">
     <div class="listings-header">
-        <h1>Explore Homes</h1>
+        <div class="listings-header-top">
+            <h1>Explore Homes</h1>
+            <% if (totalResults > 0) { %>
+                <span class="results-count">
+                    <%= totalResults %> <%= totalResults === 1 ? 'property' : 'properties' %> found
+                </span>
+            <% } %>
+        </div>
+        <div class="listings-header-controls">
+            <label for="sortSelect" class="sr-only">Sort listings</label>
+            <select id="sortSelect" class="sort-select" onchange="handleSortChange()" aria-label="Sort listings">
+                <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
+                <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>>Top Rated</option>
+            </select>
+        </div>
     </div>
 
     <% if (allListings.length > 0) { %>
@@ -58,10 +74,52 @@
                 </a>
             <% } %>
         </div>
+
+        <% if (totalPages > 1) { %>
+            <nav class="pagination-wrapper" aria-label="Listings pagination">
+                <ul class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/listings?<%= paginationQuery(currentPage - 1) %>" aria-label="Previous">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                    <% } %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                            <a class="page-link pagination-number" href="/listings?<%= paginationQuery(i) %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/listings?<%= paginationQuery(currentPage + 1) %>" aria-label="Next">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </nav>
+        <% } %>
     <% } else { %>
         <div class="no-listings">
+            <i class="fas fa-search" style="font-size: 2.5rem; color: #e0e0e0; margin-bottom: 1rem;"></i>
             <h2>No listings found</h2>
-            <p>Check back soon for amazing homes!</p>
+            <% if (search) { %>
+                <p>No results for "<strong><%= search %></strong>". Try a different search term or category.</p>
+            <% } else { %>
+                <p>Check back soon for amazing homes!</p>
+            <% } %>
+            <a href="/listings" class="no-listings-btn">View all listings</a>
         </div>
     <% } %>
 </div>
+
+<script>
+    function handleSortChange() {
+        const sort = document.getElementById("sortSelect").value;
+        const params = new URLSearchParams(window.location.search);
+        params.set("sort", sort);
+        params.delete("page");
+        window.location.href = "/listings?" + params.toString();
+    }
+</script>

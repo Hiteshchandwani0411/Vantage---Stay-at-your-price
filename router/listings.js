@@ -14,6 +14,7 @@ const {
   updateListing,
   destoryListing,
   editListing,
+  showSuggestions,
 } = require("../controllers/listing.controller");
 
 router
@@ -28,6 +29,10 @@ router
 
 // New listing
 router.get("/new", isLoggedIn, newListing);
+
+// Search suggestions API (must be registered before /:id)
+router.get("/suggestions", wrapAsync(showSuggestions));
+
 router
   .route("/:id")
   .get(wrapAsync(showListing))

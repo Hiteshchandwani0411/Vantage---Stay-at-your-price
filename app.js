@@ -72,6 +72,7 @@ app.use((req, res, next) => {
   res.locals.currUser = req.user;
   res.locals.categories = categoriesList;
   res.locals.selectedCategory = req.query.category || "trending";
+  res.locals.currentQuery = req.query;
   next();
 });
 

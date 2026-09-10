@@ -19,7 +19,10 @@ Vantage is a modern accommodation marketplace where users can explore stays, sav
 ## ✨ Features
 
 ### For Guests
-- 🔍 Browse, search, and explore property listings
+- 🔍 Search listings across title, location, country, and description right from the navbar
+- 💡 Live autocomplete suggestions with 300ms debounce (thumbnails, highlighted matches, keyboard navigation)
+- 🔀 Sort results by newest, price, or top-rated
+- 📄 Paginated exploration (12 per page) with state-preserving filters
 - 🗂️ Filter stays by category and trending picks (26+ categories)
 - 💜 Save listings to a personal wishlist
 - ⭐ Add reviews and ratings to listings you've stayed at
@@ -28,6 +31,8 @@ Vantage is a modern accommodation marketplace where users can explore stays, sav
 ### For Hosts
 - 🏠 List new properties with rich descriptions
 - 🖼️ Upload images with storage handled by Cloudinary + Multer
+- 👀 Live image preview with drag-and-drop, file type & size validation before publishing
+- 🏷️ Choose a property category from 26+ pickable options
 - 📍 Attach map coordinates to every listing
 - ✏️ Edit or remove your own listings
 - 🔐 Secure authentication with Passport.js (sign up / login / logout)
@@ -102,6 +107,8 @@ Before you begin, make sure you have the following installed and set up:
    ```
 
 4. **(Optional) Seed the database with sample listings**
+
+   Sample listings are auto-geocoded via MapTiler so every seeded stay has map coordinates:
 
    ```bash
    node init/index.js
@@ -195,7 +202,8 @@ All configuration is loaded from a `.env` file using [dotenv](https://www.npmjs.
 | Method | Route                 | Description                  |
 | ------ | --------------------- | ---------------------------- |
 | GET    | `/`                   | Landing page                 |
-| GET    | `/listings`           | Explore all listings         |
+| GET    | `/listings`           | Explore listings (supports `?search=`, `?sort=`, `?page=`, `?category=`) |
+| GET    | `/listings/suggestions` | Autocomplete API for search suggestions |
 | GET    | `/listings/new`       | Form to host a new property  |
 | GET    | `/listings/:id`       | Property details page        |
 | GET    | `/signup`             | Create an account            |
